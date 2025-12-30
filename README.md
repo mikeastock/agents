@@ -118,7 +118,7 @@ Example: `skill-overrides/brainstorming-claude.md` is prepended to the brainstor
 
 | Tool | Agent | Description |
 |------|-------|-------------|
-| `question` | Pi | Let the LLM ask the user a question with selectable options |
+| `AskUserQuestion` | Pi | Let the LLM ask the user a question with selectable options |
 
 ## Available Hooks
 

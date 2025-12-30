@@ -98,7 +98,7 @@ Show the user:
 
 ### 4. Ask User What To Do
 
-Use the question tool to ask:
+Use the AskUserQuestion tool to ask:
 ```
 "How would you like to proceed with this failure?"
 Options:

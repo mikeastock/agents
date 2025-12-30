@@ -23,8 +23,8 @@ const QuestionParams = Type.Object({
 
 const factory: CustomToolFactory = (pi) => {
 	const tool: CustomAgentTool<typeof QuestionParams, QuestionDetails> = {
-		name: "question",
-		label: "Question",
+		name: "AskUserQuestion",
+		label: "AskUserQuestion",
 		description: "Ask the user a question and let them pick from options. Use when you need user input to proceed.",
 		parameters: QuestionParams,
 
@@ -81,7 +81,7 @@ const factory: CustomToolFactory = (pi) => {
 		},
 
 		renderCall(args, theme) {
-			let text = theme.fg("toolTitle", theme.bold("question ")) + theme.fg("muted", args.question);
+			let text = theme.fg("toolTitle", theme.bold("AskUserQuestion ")) + theme.fg("muted", args.question);
 			if (args.options?.length) {
 				text += `\n${theme.fg("dim", `  Options: ${args.options.join(", ")}`)}`;
 			}
