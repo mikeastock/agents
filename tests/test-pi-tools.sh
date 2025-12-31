@@ -25,21 +25,21 @@ if ! command -v node &> /dev/null; then
     exit 1
 fi
 
-# Check for npm
-if ! command -v npm &> /dev/null; then
-    log_error "npm is required but not installed"
+# Check for pnpm
+if ! command -v pnpm &> /dev/null; then
+    log_error "pnpm is required but not installed"
     exit 1
 fi
 
 cd "$PROJECT_DIR"
 
 # Install dependencies
-log_test "Installing npm dependencies..."
-if npm install --silent 2>&1; then
-    log_info "PASS: npm install succeeded"
+log_test "Installing pnpm dependencies..."
+if pnpm install --silent 2>&1; then
+    log_info "PASS: pnpm install succeeded"
     TESTS_PASSED=$((TESTS_PASSED + 1))
 else
-    log_error "FAIL: npm install failed"
+    log_error "FAIL: pnpm install failed"
     TESTS_FAILED=$((TESTS_FAILED + 1))
     print_summary
     exit 1
@@ -47,7 +47,7 @@ fi
 
 # Run type-check
 log_test "Type-checking Pi tools..."
-TYPECHECK_OUTPUT=$(npm run typecheck 2>&1) || true
+TYPECHECK_OUTPUT=$(pnpm run typecheck 2>&1) || true
 
 if echo "$TYPECHECK_OUTPUT" | grep -q "error TS"; then
     log_error "FAIL: TypeScript errors found"
