@@ -41,6 +41,7 @@ agents/
 │       └── AskUserQuestion/
 ├── hooks/
 │   └── pi/
+│       ├── answer/
 │       ├── confirm-destructive/
 │       └── protected-paths/
 ├── tests/                            # test suite
@@ -123,6 +124,7 @@ Example: `skill-overrides/brainstorming-claude.md` is prepended to the brainstor
 
 | Hook | Agent | Description |
 |------|-------|-------------|
+| `answer` | Pi | Extracts questions from assistant responses into interactive Q&A with custom TUI |
 | `confirm-destructive` | Pi | Prompts for confirmation before destructive session actions (macOS only) |
 | `protected-paths` | Pi | Blocks write and edit operations to protected paths (.env, .git/, node_modules/) |
 
