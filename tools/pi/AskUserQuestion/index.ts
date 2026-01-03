@@ -28,7 +28,7 @@ const factory: CustomToolFactory = (pi) => {
 		description: "Ask the user a question and let them pick from options. Use when you need user input to proceed.",
 		parameters: QuestionParams,
 
-		async execute(_toolCallId, params, _signal, _onUpdate) {
+		async execute(_toolCallId, params, _onUpdate, _ctx, _signal) {
 			if (!pi.hasUI) {
 				return {
 					content: [{ type: "text", text: "Error: UI not available (running in non-interactive mode)" }],
