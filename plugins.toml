@@ -36,7 +36,6 @@ skills = ["dspy-ruby"]
 
 [agent-stuff]
 url = "https://github.com/mitsuhiko/agent-stuff"
-skills = []  # No skills from this plugin
 hooks = ["answer"]
 
 [dev-browser]
@@ -45,6 +44,5 @@ skills = ["*"]  # Install all skills from this plugin
 
 [pi-interview-tool]
 url = "https://github.com/nicobailon/pi-interview-tool"
-skills = []  # No skills from this plugin
 tools_path = "."  # Tool files are at root level
 tools = ["*"]  # Install all tools from this plugin
