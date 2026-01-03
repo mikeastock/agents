@@ -92,6 +92,7 @@ install-skills: build
 install-tools:
 	@echo "Installing custom tools for Pi agent..."
 	@mkdir -p $(PI_TOOLS_DIR)
+	@# Install tools from tools/pi/
 	@if [ -d "$(TOOLS_SRC)/pi" ]; then \
 		for tool in $(TOOLS_SRC)/pi/*/; do \
 			if [ -d "$$tool" ]; then \
@@ -102,6 +103,17 @@ install-tools:
 			fi \
 		done; \
 	fi
+	@# Install tool plugins (plugins with index.ts at root)
+	@for plugin_dir in $(PLUGINS_DIR)/*/; do \
+		if [ -f "$$plugin_dir/index.ts" ]; then \
+			plugin_name=$$(basename "$$plugin_dir"); \
+			tool_name=$$(echo "$$plugin_name" | sed 's/^pi-//' | sed 's/-tool$$//'); \
+			echo "  → $$tool_name (from $$plugin_name plugin)"; \
+			rm -rf "$(PI_TOOLS_DIR)/$$tool_name"; \
+			cp -r "$$plugin_dir" "$(PI_TOOLS_DIR)/$$tool_name"; \
+			rm -f "$(PI_TOOLS_DIR)/$$tool_name/.git"; \
+		fi \
+	done
 	@echo "✓ Pi tools installed to $(PI_TOOLS_DIR)"
 
 install-hooks:
@@ -254,6 +266,14 @@ clean:
 			fi \
 		done; \
 	fi
+	@# Clean Pi tool plugins
+	@for plugin_dir in $(PLUGINS_DIR)/*/; do \
+		if [ -f "$$plugin_dir/index.ts" ]; then \
+			plugin_name=$$(basename "$$plugin_dir"); \
+			tool_name=$$(echo "$$plugin_name" | sed 's/^pi-//' | sed 's/-tool$$//'); \
+			rm -rf "$(PI_TOOLS_DIR)/$$tool_name"; \
+		fi \
+	done
 	@# Clean Pi hooks
 	@if [ -d "$(HOOKS_SRC)/pi" ]; then \
 		for hook in $(HOOKS_SRC)/pi/*/; do \

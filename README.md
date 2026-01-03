@@ -30,7 +30,8 @@ agents/
 │   ├── superpowers/                  # git submodule (github.com/obra/superpowers)
 │   ├── superpowers-enabled.txt       # which skills to install (optional)
 │   ├── dev-browser/                  # git submodule (github.com/SawyerHood/dev-browser)
-│   └── dev-browser-enabled.txt       # which skills to install (optional)
+│   ├── dev-browser-enabled.txt       # which skills to install (optional)
+│   └── pi-interview-tool/            # git submodule (github.com/nicobailon/pi-interview-tool)
 ├── skills/                           # custom skills
 │   └── fetching-buildkite-failures/
 ├── skill-overrides/                  # agent-specific prepends
@@ -64,6 +65,7 @@ Skills are pulled from git submodules in `plugins/`. Each plugin can have an opt
 | `anthropic-skills` | [anthropics/skills](https://github.com/anthropics/skills) | Official Anthropic skills for documents, design, etc. |
 | `superpowers` | [obra/superpowers](https://github.com/obra/superpowers) | Workflow skills for brainstorming, debugging, TDD, etc. |
 | `dev-browser` | [SawyerHood/dev-browser](https://github.com/SawyerHood/dev-browser) | Browser automation skill |
+| `pi-interview-tool` | [nicobailon/pi-interview-tool](https://github.com/nicobailon/pi-interview-tool) | Web-based interview form tool for Pi agent |
 
 ### Updating Plugins
 
@@ -118,6 +120,7 @@ Example: `skill-overrides/brainstorming-claude.md` is prepended to the brainstor
 | Tool | Agent | Description |
 |------|-------|-------------|
 | `AskUserQuestion` | Pi | Ask the user a question and let them pick from options or enter a custom response |
+| `interview` | Pi | Present an interactive web form to gather user responses to questions with support for single/multi-select, text, and image inputs |
 
 ## Available Hooks
 

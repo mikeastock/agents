@@ -10,3 +10,6 @@
 [submodule "plugins/compound-engineering"]
 	path = plugins/compound-engineering
 	url = https://github.com/EveryInc/compound-engineering-plugin
+[submodule "plugins/pi-interview-tool"]
+	path = plugins/pi-interview-tool
+	url = https://github.com/nicobailon/pi-interview-tool
