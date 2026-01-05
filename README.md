@@ -38,8 +38,7 @@ agents/
 │   ├── agent-stuff/                  # git submodule (github.com/mitsuhiko/agent-stuff)
 │   └── pi-interview-tool/            # git submodule (github.com/nicobailon/pi-interview-tool)
 ├── skills/                           # custom skills
-│   ├── fetching-buildkite-failures/
-│   └── semantic-commit/
+│   └── fetching-buildkite-failures/
 ├── commands/                         # slash commands (Claude Code, Codex)
 │   └── semantic-commit.md
 ├── skill-overrides/                  # agent-specific appends
@@ -49,7 +48,8 @@ agents/
 │   └── pi/
 │       ├── AskUserQuestion/
 │       ├── confirm-destructive/
-│       └── protected-paths/
+│       ├── protected-paths/
+│       └── semantic-commit/
 ├── scripts/
 │   └── build.py                      # Python build system
 ├── tests/                            # test suite
@@ -159,7 +159,6 @@ Example: `skill-overrides/brainstorming-pi.md` is appended to the brainstorming 
 | Skill | Description |
 |-------|-------------|
 | `fetching-buildkite-failures` | Fetches build results from Buildkite and helps diagnose CI failures |
-| `semantic-commit` | Create git commits following the Conventional Commits specification |
 
 ## Available Commands
 
@@ -188,6 +187,7 @@ Example: `skill-overrides/brainstorming-pi.md` is appended to the brainstorming 
 | `AskUserQuestion` | Pi | Ask the user a question and let them pick from options or enter a custom response |
 | `confirm-destructive` | Pi | Prompts for confirmation before destructive session actions (macOS only) |
 | `protected-paths` | Pi | Blocks write and edit operations to protected paths (.env, .git/, node_modules/) |
+| `semantic-commit` | Pi | Registers `/semantic-commit` command for Conventional Commits |
 
 ## What are Skills?
 
