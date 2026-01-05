@@ -84,20 +84,6 @@ if status is-interactive
     end
 
     # ===========================================
-    # API Keys (loaded from environment or defaults)
-    # ===========================================
-    if set -q ANTHROPIC_OAUTH_TOKEN
-        set -gx ANTHROPIC_OAUTH_TOKEN $ANTHROPIC_OAUTH_TOKEN
-    end
-    if set -q CEREBRAS_API_KEY
-        set -gx CEREBRAS_API_KEY $CEREBRAS_API_KEY
-    end
-    if set -q BUILDKITE_API_TOKEN
-        set -gx BUILDKITE_API_TOKEN $BUILDKITE_API_TOKEN
-    end
-    set -gx BUILDKITE_ORGANIZATION_SLUG buildr
-
-    # ===========================================
     # OrbStack service discovery
     # ===========================================
     set -gx PGHOST docker.orb.internal
