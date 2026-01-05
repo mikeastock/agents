@@ -18,7 +18,7 @@ This initializes submodules, builds skills (applying overrides), and installs th
 ```
 make install             Initialize submodules and install skills, commands, and extensions
 make install-skills      Install skills only (Claude Code, Codex, Pi agent)
-make install-commands    Install slash commands only (Claude Code, Codex)
+make install-commands    Install slash commands only (Claude Code, Codex, Pi agent)
 make install-extensions  Install extensions only (Pi agent)
 make build               Build skills with overrides (without installing)
 make clean               Remove all installed skills, commands, extensions, and build artifacts
@@ -48,8 +48,7 @@ agents/
 │   └── pi/
 │       ├── AskUserQuestion/
 │       ├── confirm-destructive/
-│       ├── protected-paths/
-│       └── semantic-commit/
+│       └── protected-paths/
 ├── scripts/
 │   └── build.py                      # Python build system
 ├── tests/                            # test suite
@@ -187,7 +186,6 @@ Example: `skill-overrides/brainstorming-pi.md` is appended to the brainstorming 
 | `AskUserQuestion` | Pi | Ask the user a question and let them pick from options or enter a custom response |
 | `confirm-destructive` | Pi | Prompts for confirmation before destructive session actions (macOS only) |
 | `protected-paths` | Pi | Blocks write and edit operations to protected paths (.env, .git/, node_modules/) |
-| `semantic-commit` | Pi | Registers `/semantic-commit` command for Conventional Commits |
 
 ## What are Skills?
 
@@ -230,7 +228,7 @@ See Pi's [skills documentation](https://github.com/badlogic/pi-mono/tree/main/pa
 
 Slash commands are shortcuts that trigger specific prompts or actions. They are markdown files that define a prompt template invoked via `/command-name` syntax.
 
-> **Note:** Slash commands are currently supported by Claude Code and Codex CLI.
+All three agents support the same markdown format with YAML frontmatter (`description`) and content with argument placeholders (`$1`, `$ARGUMENTS`).
 
 ### Command Locations
 
@@ -238,6 +236,7 @@ Slash commands are shortcuts that trigger specific prompts or actions. They are 
 |-------|----------|
 | Claude Code | `~/.claude/commands/` |
 | Codex CLI | `~/.codex/commands/` |
+| Pi Coding Agent | `~/.pi/agent/prompts/` |
 
 ## What are Extensions?
 

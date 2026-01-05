@@ -21,7 +21,7 @@ help:
 	@echo "Usage:"
 	@echo "  make install             Initialize submodules and install skills, commands, and extensions"
 	@echo "  make install-skills      Install skills only (Claude Code, Codex, Pi agent)"
-	@echo "  make install-commands    Install slash commands only (Claude Code, Codex)"
+	@echo "  make install-commands    Install slash commands only (Claude Code, Codex, Pi)"
 	@echo "  make install-extensions  Install extensions only (Pi agent)"
 	@echo "  make build               Build skills with overrides (without installing)"
 	@echo "  make plugin-update       Update all plugin submodules to latest"

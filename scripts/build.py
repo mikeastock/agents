@@ -52,6 +52,7 @@ INSTALL_PATHS = {
     },
     "pi": {
         "skills": HOME / ".pi" / "agent" / "skills",
+        "prompts": HOME / ".pi" / "agent" / "prompts",
         "extensions": HOME / ".pi" / "agent" / "extensions",
     },
 }
@@ -303,10 +304,12 @@ def install_commands():
         return
 
     for agent, paths in INSTALL_PATHS.items():
-        if "commands" not in paths:
+        # Claude/Codex use "commands", Pi uses "prompts" (same format)
+        dest_key = "commands" if "commands" in paths else "prompts" if "prompts" in paths else None
+        if not dest_key:
             continue
 
-        dest = paths["commands"]
+        dest = paths[dest_key]
         dest.mkdir(parents=True, exist_ok=True)
 
         count = 0
@@ -383,16 +386,18 @@ def clean(plugins: dict[str, Plugin]):
                             remove_path(installed)
                             print(f"  Removed skill: {skill_dir.name} from {agent}")
 
-    # Clean commands from all agents
+    # Clean commands from all agents (commands for Claude/Codex, prompts for Pi)
     if COMMANDS_DIR.exists():
         for agent, paths in INSTALL_PATHS.items():
-            if "commands" in paths:
-                for cmd_file in COMMANDS_DIR.iterdir():
-                    if cmd_file.is_file() and cmd_file.suffix == ".md":
-                        installed = paths["commands"] / cmd_file.name
-                        if installed.exists():
-                            installed.unlink()
-                            print(f"  Removed command: {cmd_file.name} from {agent}")
+            dest_key = "commands" if "commands" in paths else "prompts" if "prompts" in paths else None
+            if not dest_key:
+                continue
+            for cmd_file in COMMANDS_DIR.iterdir():
+                if cmd_file.is_file() and cmd_file.suffix == ".md":
+                    installed = paths[dest_key] / cmd_file.name
+                    if installed.exists():
+                        installed.unlink()
+                        print(f"  Removed command: {cmd_file.name} from {agent}")
 
     # Clean extensions
     ext_dest = INSTALL_PATHS["pi"]["extensions"]
