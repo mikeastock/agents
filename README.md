@@ -40,6 +40,8 @@ agents/
 ├── skills/                           # custom skills
 │   ├── fetching-buildkite-failures/
 │   └── semantic-commit/
+├── commands/                         # slash commands (Claude Code)
+│   └── semantic-commit.md
 ├── skill-overrides/                  # agent-specific appends
 │   ├── brainstorming-claude.md
 │   └── brainstorming-pi.md
