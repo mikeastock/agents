@@ -35,6 +35,7 @@ PLUGINS_DIR = ROOT / "plugins"
 SKILLS_DIR = ROOT / "skills"
 TOOLS_DIR = ROOT / "tools"
 HOOKS_DIR = ROOT / "hooks"
+COMMANDS_DIR = ROOT / "commands"
 OVERRIDES_DIR = ROOT / "skill-overrides"
 BUILD_DIR = ROOT / "build"
 CONFIG_FILE = ROOT / "plugins.toml"
@@ -44,9 +45,11 @@ HOME = Path.home()
 INSTALL_PATHS = {
     "claude": {
         "skills": HOME / ".claude" / "skills",
+        "commands": HOME / ".claude" / "commands",
     },
     "codex": {
         "skills": HOME / ".codex" / "skills",
+        "commands": HOME / ".codex" / "commands",
     },
     "pi": {
         "skills": HOME / ".pi" / "agent" / "skills",
@@ -300,6 +303,31 @@ def install_skills():
         print(f"  {agent}: {count} skills -> {dest}")
 
 
+def install_commands():
+    """Install slash commands to agent directories."""
+    print("Installing commands...")
+
+    if not COMMANDS_DIR.exists():
+        print("  No commands directory found, skipping")
+        return
+
+    for agent, paths in INSTALL_PATHS.items():
+        if "commands" not in paths:
+            continue
+
+        dest = paths["commands"]
+        dest.mkdir(parents=True, exist_ok=True)
+
+        count = 0
+        for cmd_file in sorted(COMMANDS_DIR.iterdir()):
+            if cmd_file.is_file() and cmd_file.suffix == ".md":
+                dest_cmd = dest / cmd_file.name
+                shutil.copy(cmd_file, dest_cmd)
+                count += 1
+
+        print(f"  {agent}: {count} commands -> {dest}")
+
+
 def install_hooks(plugins: dict[str, Plugin]):
     """Install hooks from plugins and custom hooks directory."""
     print("Installing hooks...")
@@ -411,6 +439,17 @@ def clean(plugins: dict[str, Plugin]):
                             remove_path(installed)
                             print(f"  Removed skill: {skill_dir.name} from {agent}")
 
+    # Clean commands from all agents
+    if COMMANDS_DIR.exists():
+        for agent, paths in INSTALL_PATHS.items():
+            if "commands" in paths:
+                for cmd_file in COMMANDS_DIR.iterdir():
+                    if cmd_file.is_file() and cmd_file.suffix == ".md":
+                        installed = paths["commands"] / cmd_file.name
+                        if installed.exists():
+                            installed.unlink()
+                            print(f"  Removed command: {cmd_file.name} from {agent}")
+
     # Clean hooks
     hooks_dest = INSTALL_PATHS["pi"]["hooks"]
     for plugin in plugins.values():
@@ -459,7 +498,7 @@ def clean(plugins: dict[str, Plugin]):
 
 def main():
     parser = argparse.ArgumentParser(description="Build and install AI agent plugins")
-    parser.add_argument("command", choices=["build", "install", "install-skills", "install-tools", "install-hooks", "clean", "submodule-init"],
+    parser.add_argument("command", choices=["build", "install", "install-skills", "install-commands", "install-tools", "install-hooks", "clean", "submodule-init"],
                         help="Command to run")
     args = parser.parse_args()
 
@@ -473,12 +512,15 @@ def main():
         init_submodules()
         build_skills(plugins)
         install_skills()
+        install_commands()
         install_tools(plugins)
         install_hooks(plugins)
         print("\nAll done!")
     elif args.command == "install-skills":
         build_skills(plugins)
         install_skills()
+    elif args.command == "install-commands":
+        install_commands()
     elif args.command == "install-tools":
         install_tools(plugins)
     elif args.command == "install-hooks":
