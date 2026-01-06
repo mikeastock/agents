@@ -150,6 +150,37 @@ ENV PATH="/home/node/.local/bin:${PATH}"
 # Preinstall managed Python for uv.
 RUN uv python install 3.14
 
+# Install Ruby 3.4.7 via ruby-install.
+USER root
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    autoconf \
+    bison \
+    libssl-dev \
+    libyaml-dev \
+    libreadline-dev \
+    zlib1g-dev \
+    libncurses-dev \
+    libffi-dev \
+    libgdbm-dev \
+    rustc \
+  && rm -rf /var/lib/apt/lists/*
+
+ARG RUBY_INSTALL_VERSION=0.9.4
+RUN curl -fsSL "https://github.com/postmodern/ruby-install/releases/download/v${RUBY_INSTALL_VERSION}/ruby-install-${RUBY_INSTALL_VERSION}.tar.gz" \
+    | tar -xz -C /tmp \
+  && cd /tmp/ruby-install-${RUBY_INSTALL_VERSION} \
+  && make install \
+  && rm -rf /tmp/ruby-install-${RUBY_INSTALL_VERSION}
+
+ARG RUBY_VERSION=3.4.7
+RUN ruby-install --system ruby ${RUBY_VERSION} -- --disable-install-doc \
+  && rm -rf /usr/local/src/ruby-${RUBY_VERSION}* \
+  && ruby -v
+
+USER node
+
 # Passwordless sudo for the non-root user (for unattended / automation workflows).
 USER root
 RUN echo "node ALL=(root) NOPASSWD: ALL" > /etc/sudoers.d/yolo \
