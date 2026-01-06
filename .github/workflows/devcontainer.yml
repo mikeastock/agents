@@ -22,7 +22,7 @@ jobs:
 
       - name: Validate devcontainer.json schema
         run: |
-          pipx run check-jsonschema --builtin-schema vendor.devcontainer devcontainer/devcontainer.json
+          pipx run check-jsonschema --schemafile "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json" devcontainer/devcontainer.json
 
   build:
     runs-on: ubuntu-latest
