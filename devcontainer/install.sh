@@ -21,7 +21,7 @@ USAGE
 }
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-TEMPLATE_FILES=(Dockerfile devcontainer.json post_install.py)
+TEMPLATE_FILES=(Dockerfile devcontainer.json post_install.py codex-config.toml)
 
 die() {
   echo "error: $*" >&2

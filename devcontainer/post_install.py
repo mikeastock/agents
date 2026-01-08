@@ -51,28 +51,7 @@ set -as terminal-features ",xterm-ghostty:RGB"
 set -ga terminal-overrides '*:Ss=\\E[%p1%d q:Se=\\E[ q'
 """
 
-CODEX_CONFIG = """\
-approval_policy = "never"
-sandbox_mode = "danger-full-access"
-model = "gpt-5.2-codex"
-model_reasoning_effort = "high"
-tool_output_token_limit = 25000
-# Leave room for native compaction near the 272–273k context window.
-# Formula: 273000 - (tool_output_token_limit + 15000)
-# With tool_output_token_limit=25000 ⇒ 273000 - (25000 + 15000) = 233000
-model_auto_compact_token_limit = 233000
-
-[features]
-ghost_commit = false
-unified_exec = true
-apply_patch_freeform = true
-web_search_request = true
-skills = true
-shell_snapshot = true
-
-[projects."/workspace"]
-trust_level = "trusted"
-"""
+SCRIPT_DIR = Path(__file__).parent
 
 
 def log(message: str) -> None:
@@ -154,7 +133,12 @@ def ensure_codex_config() -> None:
         log(f"skipping codex config (already exists at {codex_config})")
         return
 
-    codex_config.write_text(CODEX_CONFIG, encoding="utf-8")
+    source = SCRIPT_DIR / "codex-config.toml"
+    if not source.exists():
+        log(f"codex config template not found at {source}")
+        return
+
+    shutil.copyfile(source, codex_config)
     log(f"wrote default codex config to {codex_config}")
 
 
