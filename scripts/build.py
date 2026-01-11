@@ -22,6 +22,12 @@ INTERACTIVE_EXTENSIONS = {
     "confirm-destructive",
 }
 
+# Plugins that require user interaction and should be skipped entirely in non-interactive mode
+# Use fully qualified names (owner/repo)
+INTERACTIVE_PLUGINS = {
+    "nicobailon/pi-interview-tool",
+}
+
 # Skill override patterns that require user interaction (skill name patterns)
 # Overrides matching these patterns are skipped in non-interactive mode
 INTERACTIVE_OVERRIDE_PATTERNS = {
@@ -184,6 +190,10 @@ def discover_items(plugin: Plugin, item_type: str) -> list[tuple[str, Path]]:
     - ["*"] = all items (wildcard)
     - ["item1", "item2"] = only specified items
     """
+    # Skip entire plugin in non-interactive mode if it's marked as interactive
+    if NON_INTERACTIVE and plugin.name in INTERACTIVE_PLUGINS:
+        return []
+
     plugin_dir = PLUGINS_DIR / plugin.dir_name
     if not plugin_dir.exists():
         return []
@@ -293,9 +303,15 @@ def build_skills(plugins: dict[str, Plugin]):
         agent_dir.mkdir(parents=True)
 
     built = set()
+    skipped_plugins = []
 
     # Process plugins
     for plugin in plugins.values():
+        # Track skipped interactive plugins
+        if NON_INTERACTIVE and plugin.name in INTERACTIVE_PLUGINS:
+            skipped_plugins.append(plugin.name)
+            continue
+
         for name, path in discover_items(plugin, "skills"):
             if name in built:
                 print(f"    Warning: Skill '{name}' already exists, skipping duplicate from {plugin.name}")
@@ -305,6 +321,9 @@ def build_skills(plugins: dict[str, Plugin]):
                     if agent == AGENTS[0]:  # Only print once
                         print(f"  {name} (from {plugin.name})")
                     built.add(name)
+
+    if skipped_plugins:
+        print(f"  Skipped {len(skipped_plugins)} interactive plugins: {', '.join(skipped_plugins)}")
 
     # Process custom skills
     if SKILLS_DIR.exists():
@@ -382,16 +401,22 @@ def install_extensions(plugins: dict[str, Plugin]):
     print("Installing extensions...")
 
     if NON_INTERACTIVE:
-        print("  (non-interactive mode: skipping interactive extensions)")
+        print("  (non-interactive mode: skipping interactive extensions and plugins)")
 
     dest = INSTALL_PATHS["pi"]["extensions"]
     dest.mkdir(parents=True, exist_ok=True)
 
     installed = set()
-    skipped = []
+    skipped_extensions = []
+    skipped_plugins = []
 
     # Extensions from plugins
     for plugin in plugins.values():
+        # Track skipped interactive plugins
+        if NON_INTERACTIVE and plugin.name in INTERACTIVE_PLUGINS:
+            skipped_plugins.append(plugin.name)
+            continue
+
         for name, path in discover_items(plugin, "extensions"):
             if name in installed:
                 print(f"    Warning: Extension '{name}' already exists, skipping duplicate from {plugin.name}")
@@ -399,7 +424,7 @@ def install_extensions(plugins: dict[str, Plugin]):
 
             # Skip interactive extensions in non-interactive mode
             if NON_INTERACTIVE and name in INTERACTIVE_EXTENSIONS:
-                skipped.append(name)
+                skipped_extensions.append(name)
                 continue
 
             dest_ext = dest / name
@@ -424,7 +449,7 @@ def install_extensions(plugins: dict[str, Plugin]):
 
                 # Skip interactive extensions in non-interactive mode
                 if NON_INTERACTIVE and name in INTERACTIVE_EXTENSIONS:
-                    skipped.append(name)
+                    skipped_extensions.append(name)
                     continue
 
                 if name in installed:
@@ -437,8 +462,10 @@ def install_extensions(plugins: dict[str, Plugin]):
                 print(f"  {name} (custom)")
                 installed.add(name)
 
-    if skipped:
-        print(f"  Skipped {len(skipped)} interactive extensions: {', '.join(skipped)}")
+    if skipped_plugins:
+        print(f"  Skipped {len(skipped_plugins)} interactive plugins: {', '.join(skipped_plugins)}")
+    if skipped_extensions:
+        print(f"  Skipped {len(skipped_extensions)} interactive extensions: {', '.join(skipped_extensions)}")
     print(f"  Installed {len(installed)} extensions to {dest}")
 
 
