@@ -2,6 +2,9 @@
 name: mcporter
 description: Interact with MCP (Model Context Protocol) servers using the mcporter CLI. Use this skill when you need to list available MCP servers, view tool schemas, call MCP tools, manage OAuth authentication, or generate CLI wrappers and TypeScript types for MCP servers.
 compatibility: Requires mcporter binary (install via npm install -g mcporter)
+metadata:
+  homepage: https://mcporter.dev
+  author: mcporter
 ---
 
 # mcporter
