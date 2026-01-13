@@ -1,20 +1,13 @@
 /**
- * Confirm Destructive Actions Extension (macOS only)
+ * Confirm Destructive Actions Extension
  *
- * Prompts for confirmation before destructive session actions (clear, switch, branch).
+ * Prompts for confirmation before destructive session actions (clear, switch, fork).
  * Demonstrates how to cancel session events using the before_* events.
- *
- * This extension only runs on macOS.
  */
 
 import type { ExtensionAPI, SessionBeforeSwitchEvent, SessionMessageEntry } from "@mariozechner/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
-	// Only run on macOS
-	if (process.platform !== "darwin") {
-		return;
-	}
-
 	pi.on("session_before_switch", async (event: SessionBeforeSwitchEvent, ctx) => {
 		if (!ctx.hasUI) return;
 
@@ -50,16 +43,16 @@ export default function (pi: ExtensionAPI) {
 		}
 	});
 
-	pi.on("session_before_branch", async (event, ctx) => {
+	pi.on("session_before_fork", async (event, ctx) => {
 		if (!ctx.hasUI) return;
 
-		const choice = await ctx.ui.select(`Branch from entry ${event.entryId.slice(0, 8)}?`, [
-			"Yes, create branch",
+		const choice = await ctx.ui.select(`Fork from entry ${event.entryId.slice(0, 8)}?`, [
+			"Yes, create fork",
 			"No, stay in current session",
 		]);
 
-		if (choice !== "Yes, create branch") {
-			ctx.ui.notify("Branch cancelled", "info");
+		if (choice !== "Yes, create fork") {
+			ctx.ui.notify("Fork cancelled", "info");
 			return { cancel: true };
 		}
 	});
