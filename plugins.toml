@@ -6,6 +6,8 @@
 #   skills          - List of skills to install: ["*"] for all, [] or omit for none
 #   extensions_path - Glob pattern(s) to find extensions (default: "extensions/*.ts")
 #   extensions      - List of extensions to install: ["*"] for all, [] or omit for none
+#   commands_path   - Glob pattern(s) to find commands (default: "commands/*.md")
+#   commands        - List of commands to install: ["*"] for all, [] or omit for none
 #   alias           - Optional prefix to prevent name collisions
 #
 # Plugin directories use hyphen separator: owner/repo -> plugins/owner-repo/
@@ -35,3 +37,8 @@ extensions = ["*"]  # Install all extensions from this plugin
 ["steipete/agent-scripts"]
 url = "https://github.com/steipete/agent-scripts"
 skills = ["create-cli"]
+
+["vercel-labs/web-interface-guidelines"]
+url = "https://github.com/vercel-labs/web-interface-guidelines"
+commands_path = "."  # command.md is at root level
+commands = ["command"]

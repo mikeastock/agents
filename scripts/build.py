@@ -104,6 +104,8 @@ class Plugin:
     skills: list[str] = field(default_factory=list)  # Empty = none, ["*"] = all
     extensions_path: list[str] = field(default_factory=lambda: ["extensions/*.ts"])
     extensions: list[str] = field(default_factory=list)  # Empty = none, ["*"] = all
+    commands_path: list[str] = field(default_factory=lambda: ["commands/*.md"])
+    commands: list[str] = field(default_factory=list)  # Empty = none, ["*"] = all
     alias: str | None = None
 
     @property
@@ -136,6 +138,8 @@ class Plugin:
             skills=normalize_items(data.get("skills")),
             extensions_path=normalize_path(data.get("extensions_path", "extensions/*.ts")),
             extensions=normalize_items(data.get("extensions")),
+            commands_path=normalize_path(data.get("commands_path", "commands/*.md")),
+            commands=normalize_items(data.get("commands")),
             alias=data.get("alias"),
         )
 
@@ -204,6 +208,9 @@ def discover_items(plugin: Plugin, item_type: str) -> list[tuple[str, Path]]:
     elif item_type == "extensions":
         patterns = plugin.extensions_path
         enabled = plugin.extensions
+    elif item_type == "commands":
+        patterns = plugin.commands_path
+        enabled = plugin.commands
     else:
         raise ValueError(f"Unknown item type: {item_type}")
 
@@ -219,6 +226,8 @@ def discover_items(plugin: Plugin, item_type: str) -> list[tuple[str, Path]]:
         if path.is_dir():
             name = path.name
         elif path.is_file() and path.suffix == ".ts":
+            name = path.stem
+        elif path.is_file() and path.suffix == ".md":
             name = path.stem
         else:
             continue
@@ -369,12 +378,27 @@ def install_skills():
         print(f"  {agent}: {count} skills -> {dest}")
 
 
-def install_commands():
+def install_commands(plugins: dict[str, Plugin]):
     """Install slash commands to agent directories."""
     print("Installing commands...")
 
-    if not COMMANDS_DIR.exists():
-        print("  No commands directory found, skipping")
+    # Collect all commands: (name, path, source_desc)
+    all_commands: list[tuple[str, Path, str]] = []
+
+    # Commands from plugins
+    for plugin in plugins.values():
+        for name, path in discover_items(plugin, "commands"):
+            all_commands.append((name, path, f"from {plugin.name}"))
+
+    # Commands from local directory
+    if COMMANDS_DIR.exists():
+        for cmd_file in sorted(COMMANDS_DIR.iterdir()):
+            if cmd_file.is_file() and cmd_file.suffix == ".md":
+                name = cmd_file.stem
+                all_commands.append((name, cmd_file, "custom"))
+
+    if not all_commands:
+        print("  No commands found")
         return
 
     for agent, paths in INSTALL_PATHS.items():
@@ -387,11 +411,17 @@ def install_commands():
         dest.mkdir(parents=True, exist_ok=True)
 
         count = 0
-        for cmd_file in sorted(COMMANDS_DIR.iterdir()):
-            if cmd_file.is_file() and cmd_file.suffix == ".md":
-                dest_cmd = dest / cmd_file.name
-                shutil.copy(cmd_file, dest_cmd)
-                count += 1
+        installed = set()
+        for name, path, source in all_commands:
+            if name in installed:
+                print(f"    Warning: Command '{name}' already exists, skipping duplicate")
+                continue
+            dest_cmd = dest / f"{name}.md"
+            shutil.copy(path, dest_cmd)
+            if agent == AGENTS[0]:  # Only print once
+                print(f"  {name} ({source})")
+            installed.add(name)
+            count += 1
 
         print(f"  {agent}: {count} commands -> {dest}")
 
@@ -505,11 +535,21 @@ def clean(plugins: dict[str, Plugin]):
                             print(f"  Removed skill: {skill_dir.name} from {agent}")
 
     # Clean commands from all agents (commands for Claude, prompts for Codex/Pi)
-    if COMMANDS_DIR.exists():
-        for agent, paths in INSTALL_PATHS.items():
-            dest_key = "commands" if "commands" in paths else "prompts" if "prompts" in paths else None
-            if not dest_key:
-                continue
+    for agent, paths in INSTALL_PATHS.items():
+        dest_key = "commands" if "commands" in paths else "prompts" if "prompts" in paths else None
+        if not dest_key:
+            continue
+
+        # Clean plugin commands
+        for plugin in plugins.values():
+            for name, _ in discover_items(plugin, "commands"):
+                installed = paths[dest_key] / f"{name}.md"
+                if installed.exists():
+                    installed.unlink()
+                    print(f"  Removed command: {name}.md from {agent}")
+
+        # Clean local commands
+        if COMMANDS_DIR.exists():
             for cmd_file in COMMANDS_DIR.iterdir():
                 if cmd_file.is_file() and cmd_file.suffix == ".md":
                     installed = paths[dest_key] / cmd_file.name
@@ -571,7 +611,7 @@ def main():
         init_submodules()
         build_skills(plugins)
         install_skills()
-        install_commands()
+        install_commands(plugins)
         install_extensions(plugins)
         install_codex_config()
         print("\nAll done!")
@@ -579,7 +619,7 @@ def main():
         build_skills(plugins)
         install_skills()
     elif args.command == "install-commands":
-        install_commands()
+        install_commands(plugins)
     elif args.command == "install-extensions":
         install_extensions(plugins)
     elif args.command == "clean":
